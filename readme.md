@@ -20,6 +20,7 @@ Install via [HACS](https://hacs.xyz/). Alternatively, place the apps folder and 
 | module   | string | TRUE     |         | Set to `bbgax`       |
 | class    | string | TRUE     |         | Set to `group_all_x` |
 | sort     | string | FALSE    |  True   | Sort group in alphabetic order |
+| online   | string | FALSE    |  True   | Add only devices which are online |
 | domains  | list   | TRUE     |         | List of device groups you want to generate. <br/>Valid list options are: `automation`, `cover`, `device_tracker`, `fan`, `light`, `lock`, `plant`, `remote`, `script`, `switch`, `vacuum`, `calendar`, `remember_the_milk_account`, `person` |
   
 ### Example Usage
@@ -28,6 +29,7 @@ any_name_you_wish:
   module: bbgax
   class: group_all_x
   sort: True
+  online: True
   domains: 
     - device_tracker
     - light

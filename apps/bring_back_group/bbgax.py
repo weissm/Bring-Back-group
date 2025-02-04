@@ -12,6 +12,7 @@ GROUPS = [
     dict(domain="fan", group_name="all_fans"), 
     dict(domain="light", group_name="all_lights"), 
     dict(domain="lock", group_name="all_locks"), 
+    dict(domain="Steckdose", group_name="all_plugs"), 
     dict(domain="plant", group_name="all_plants"), 
     dict(domain="remote", group_name="all_remotes"), 
     dict(domain="script", group_name="all_scripts"), 
@@ -19,7 +20,7 @@ GROUPS = [
     dict(domain="vacuum", group_name="all_vacuum_cleaners"),
     dict(domain="calendar", group_name="all_calendar"), 
     dict(domain="remember_the_milk_account", group_name="all_remember_the_milk_accounts"), 
-    dict(domain="person", group_name="all_people")
+    dict(domain="person", group_name="all_people"),
 ]
 
 # log levels
@@ -40,6 +41,7 @@ class group_all_x(hass.Hass):
         domains = self.to_list(self.args.get("domains", []))
         self.sort = self.args.get("sort")
         self.purge = self.args.get("purge")
+        self.online = self.args.get("online")
 
         for domain in domains:
             self.create_group(domain)
@@ -47,11 +49,28 @@ class group_all_x(hass.Hass):
     def getname(self, dev, domain):
         if not self.sort:
             return dev
-        entity = self.get_entity(dev)     
+        entity = self.get_entity(dev)   
+        self.log(f"Creating group: {entity.attributes}", level = INFO)        
+        if not hasattr(entity, "friendly_name"):
+            return dev
         friendly_name = entity.attributes.friendly_name        
         return friendly_name
                         
+    def getstate(self, dev, domain):
+        if not self.sort:
+            return dev
+        entity = self.get_entity(dev)   
+        self.log(f"Creating group: {entity.attributes}", level = INFO)        
+        if not hasattr(entity, "friendly_name"):
+            return dev
+        friendly_name = entity.attributes.friendly_name        
+        return friendly_name
     
+    def is_device_online(self, dev):
+        """ Überprüfen, ob das Gerät online ist """
+        state = self.get_state(dev)
+        return state != "unavailable" and state != "off"
+
     def create_group(self, domain):
         """ create group from supplied domain """
         entities = []
@@ -66,11 +85,13 @@ class group_all_x(hass.Hass):
             return
 
         for dev in self.get_state(domain):
-            entities.append(dev)
+            if self.online and self.is_device_online(dev):  # Nur online Geräte hinzufügen
+                entities.append(dev)
         
         if not entities:
-            self.log(f"No entities found for {domain}! Skipping", level = WARNING)
+            self.log(f"No online entities found for {domain}! Skipping", level = WARNING)
             return
+
         self.log(f"devicesall - before: {entities}", level = INFO)
         entities.sort(key=lambda x: self.getname(x, domain))
         if self.purge:
