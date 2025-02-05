@@ -41,7 +41,7 @@ class group_all_x(hass.Hass):
         domains = self.to_list(self.args.get("domains", []))
         self.sort = self.args.get("sort")
         self.purge = self.args.get("purge")
-        self.online = self.args.get("online")
+        self.offline = self.args.get("offline")
 
         for domain in domains:
             self.create_group(domain)
@@ -85,7 +85,7 @@ class group_all_x(hass.Hass):
             return
 
         for dev in self.get_state(domain):
-            if self.online and self.is_device_online(dev):  # Nur online Geräte hinzufügen
+            if self.offline or self.is_device_online(dev):  # add only online devices when not enforced by switch
                 entities.append(dev)
         
         if not entities:
