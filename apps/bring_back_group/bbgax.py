@@ -41,7 +41,7 @@ class group_all_x(hass.Hass):
         domains = self.to_list(self.args.get("domains", []))
         self.sort = self.args.get("sort")
         self.purge = self.args.get("purge")
-        self.offline = self.args.get("offline")
+        self.online_only = self.args.get("online_only")
 
         for domain in domains:
             self.create_group(domain)
@@ -69,7 +69,7 @@ class group_all_x(hass.Hass):
     def is_device_online(self, dev):
         """ Überprüfen, ob das Gerät online ist """
         state = self.get_state(dev)
-        return state != "unavailable" and state != "off"
+        return state != "unavailable"
 
     def create_group(self, domain):
         """ create group from supplied domain """
@@ -85,7 +85,7 @@ class group_all_x(hass.Hass):
             return
 
         for dev in self.get_state(domain):
-            if self.offline or self.is_device_online(dev):  # add only online devices when not enforced by switch
+            if not self.online_only or self.is_device_online(dev):  # add only online devices when not enforced by switch
                 entities.append(dev)
         
         if not entities:
