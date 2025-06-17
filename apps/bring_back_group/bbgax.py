@@ -53,7 +53,7 @@ class group_all_x(hass.Hass):
         self.log(f"Creating group: {entity.attributes}", level = INFO)        
         if not hasattr(entity, "friendly_name"):
             return dev
-        friendly_name = entity.attributes.friendly_name        
+        friendly_name = getattr(entity, 'friendly_name')        
         return friendly_name
                         
     def getstate(self, dev, domain):
@@ -63,7 +63,7 @@ class group_all_x(hass.Hass):
         self.log(f"Creating group: {entity.attributes}", level = INFO)        
         if not hasattr(entity, "friendly_name"):
             return dev
-        friendly_name = entity.attributes.friendly_name        
+        friendly_name = getattr(entity, 'friendly_name')        
         return friendly_name
     
     def is_device_online(self, dev):
